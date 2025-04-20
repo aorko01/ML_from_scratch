@@ -17,24 +17,41 @@ from sklearn.metrics import (
 from sklearn.preprocessing import StandardScaler
 
 
-def load_iris_data(iris_path="datasets/iris"):
-    fetch_iris_data()
-    csv_path = os.path.join(iris_path, "iris.data")
-    return pd.read_csv(csv_path, header=None)
-
-
 def load_users_vs_bots_data():
     """Load the users vs bots classification dataset using kagglehub"""
+    # Define the directory to save the dataset
+    save_dir = os.path.dirname(os.path.abspath(__file__))
+    dataset_dir = os.path.join(save_dir, "datasets")
+    users_bots_dir = os.path.join(dataset_dir, "users_vs_bots")
+
+    # Create directories if they don't exist
+    os.makedirs(users_bots_dir, exist_ok=True)
+
+    # Check if dataset already exists locally
+    local_csv_path = os.path.join(users_bots_dir, "users_vs_bots.csv")
+    if os.path.exists(local_csv_path):
+        print(f"Dataset already exists at {local_csv_path}")
+        return pd.read_csv(local_csv_path)
+
     print("Downloading users vs bots dataset from Kaggle...")
     path = kagglehub.dataset_download("juice0lover/users-vs-bots-classification")
     print("Path to dataset files:", path)
 
-    # Try to locate the CSV file in the downloaded folder
+    # Try to locate and save the CSV file from the downloaded folder
     for root, _, files in os.walk(path):
         for file in files:
             if file.endswith(".csv"):
                 print(f"Found CSV file: {file}")
-                return pd.read_csv(os.path.join(root, file))
+                csv_path = os.path.join(root, file)
+
+                # Load the dataset
+                df = pd.read_csv(csv_path)
+
+                # Save a copy to our target directory
+                df.to_csv(local_csv_path, index=False)
+                print(f"Dataset saved to {local_csv_path}")
+
+                return df
 
     raise FileNotFoundError(f"Could not find CSV file in downloaded dataset")
 

@@ -130,7 +130,6 @@ def main():
     plot_learning_curve(cost_history)
     plot_prediction_vs_actual(y_test, y_pred)
     plot_feature_importance(features, theta)
-
     # Print theta
     print("\nModel Parameters (theta):")
     print(f"Intercept: {theta[0][0]}")
